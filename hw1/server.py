@@ -7,12 +7,14 @@ def register (s, registered, userName, client_address, f):
         registered = {userName : client_address}
     elif userName not in registered:
         registered[userName] = client_address
-        f.write("received register " + userName +" from host port")
+        f.write("received register " + userName +" from host port\n")
         print (registered)
+    #welcome 
+    s.sendto(str("welcome").encode(),client_address)
     
 def recv_msg(s, receiver, registered, name, message,f):
     data = receiver + ": " + message
-    f.write("receivefrom " + name + " to " + receiver + " " + message)
+    f.write("receivefrom " + name + " to " + receiver + " " + message+"\n")
     s.sendto(data.encode(), registered.get(receiver))
 
 def leave (registered, name):
@@ -33,7 +35,7 @@ def parent_thread(s,f):
             register(s, registered, dataList[1], client_address, f)
         elif dataList[1].upper() == 'SENDTO':
             print("here")
-            f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + dataList[3])
+            f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + dataList[3]+"\n")
             recv_msg(s, dataList[2], registered, dataList[0], ' '.join(dataList[3:]),f)
         elif dataList[1] == 'EXIT':
             leave(registered, dataList[1])
@@ -57,7 +59,6 @@ def main():
 
     # declare a register dict
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('localhost', int(port)))    							# Bind to the port
 

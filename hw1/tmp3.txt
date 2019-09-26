@@ -1,4 +1,6 @@
 connecting to the server localhost at port 12348
 sending register message Jack
+received welcome 
 connecting to the server localhost at port 12348
 sending register message Jack
+sendto Hash ['yo']

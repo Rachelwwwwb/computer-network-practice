@@ -3,11 +3,13 @@ import socket
 import threading
 import os
 
-def recv_msg (sock):
+def recv_msg (sock,f):
     while True:
         data, addr = sock.recvfrom(1024)
         if data.decode() == 'EXIT':
             sys.exit(0)
+        elif data.decode().upper() == "WELCOME":
+            f.write("received welcome \n")
         print(data.decode())
 
 def send_msg (s, name, addr, f):
@@ -22,6 +24,8 @@ def send_msg (s, name, addr, f):
                 f.write("terminating client...\n")
                 sys.exit()
             #elif text[:6].upper() == "SENDTO":
+            dataList = text.split(" ")
+            f.write("sendto " + str(dataList[1]) + " " + str(dataList[2:]) + "\n")
             text = name + " " + text
             s.sendto(text.encode(), addr)
             
@@ -55,7 +59,7 @@ def main():
     server_address = (serverIP, int(port))
     
     #only send once: register some time
-    registerMessage = "REGISTER "+clientName
+    registerMessage = "REGISTER "+ clientName
     sock.sendto(registerMessage.encode(encoding="utf-8"), server_address)
     f.write("sending register message " + str(clientName) + "\n")
 
@@ -65,7 +69,7 @@ def main():
     elif pid == 0:
         send_msg(sock, clientName, server_address,f)
     else:
-        recv_msg(sock)
+        recv_msg(sock,f)
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,8 @@
 server started on localhost at port 12348...
 server started on localhost at port 12348...
-client connection from host portreceived register Hash from host portclient connection from host portreceived register Jack from host portclient connection from host portsendto Jack from Hash hireceivefrom Hash to Jack hiclient connection from host portclient connection from host portsendto Hash from Jack yoreceivefrom Jack to Hash yo
+client connection from host portreceived register Hash from host port
+client connection from host portreceived register Jack from host port
+client connection from host portsendto Jack from Hash hi
+receivefrom Hash to Jack hi
+client connection from host portsendto Hash from Jack yo
+receivefrom Jack to Hash yo
