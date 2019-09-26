@@ -16,26 +16,36 @@ if not logfile or not port :
     sys.exit()
     
 f = open(logfile, "w+")
-# declare a register list
-register = []
+# declare a register dict
+register = None
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
 s.bind(('localhost', int(port)))    							# Bind to the port
 f.write("server started on "+s.getsockname()[0]+ " at port "+ port + "...\n")
 
 while True:
     data, client_address = s.recvfrom(1024)
-    data = data.decode(encoding='utf-8').upper()
+    data = str(data.decode(encoding='utf-8').upper())
 
     #if it is a register message
     if str(data)[:8] == "REGISTER":
         f.write("client connection from host port\n")
-        userName = str(data)[9:]
-        if userName not in register:
-            register.append(userName)
-            f.write("received register " + userName + " from host port" + "\n")
-            s.sendto(str("WELCOME "+ userName).encode(encoding='utf-8'), client_address)
+        userName = str(data)[9:].upper()
+        #the register dic has not created yet
+        if register is None:
+            register = {userName : client_address}
+        elif userName not in register:
+            register.update({userName : client_address})
+        else:
+            # has registered
+            break
+        f.write("received register " + userName + " from host port" + "\n")
+        print (client_address)
+        s.sendto(str("WELCOME "+ userName).encode(encoding='utf-8'), client_address)
 
     elif data == "EXIT":
         f.write("terminating server...\n")
-    if data:
-        s.sendto(data.encode(encoding='utf-8'), client_address)
+    elif data[:6].upper() == "SENDTO":
+        print (data)
+        print (register.get(data.split()[2]))
+        # if register is None?
+        s.sendto(data.encode(encoding='utf-8'), register.get(data.split()[2]))

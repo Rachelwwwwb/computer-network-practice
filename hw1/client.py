@@ -1,6 +1,5 @@
 import sys
 import socket
-from _thread import *
 import threading
 
 port = ""
@@ -42,22 +41,27 @@ if __name__ == "__main__":
         while(hasInput):
             # contantly receive message from others
             data, server_detail = sock.recvfrom(1024)
-            data = data.decode(encoding='utf-8')
-            #print out the data for debug
-            #print (data)
+            data = str(data.decode(encoding='utf-8'))
             #if receive from the server
+            print ("line 47: " + data)
             if str(data) == "WELCOME " + clientName.upper():
                 f.write("received welcome\n")
+            else:
+                print (data)
 
             #constantly waiting for an input to send to others
             answer = str(input())
+            print ("to test if input is a blocking line")
             #if exit
             if answer.upper() == "EXIT":
                 hasInput = False
             elif answer[:6].upper() == "SENDTO":
-                user_input = str(clientName) + answer[7:]
+                user_input = "SENDTO" + " " + str(clientName) + " " + answer[7:]
                 data = user_input.encode(encoding="utf-8") 
                 sock.sendto(data, server_address)
+            else:
+                print ("here")
+                continue
 
     # except:
     #     print ("Something went wrong while connecting to server")
