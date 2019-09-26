@@ -4,15 +4,16 @@ import threading
 import os
 
 def recv_msg (sock):
-    data, addr = sock.recvfrom(1024)
-    if data.decode() == 'EXIT':
-        sys.exit(0)
-    print(data.decode())
+    while True:
+        data, addr = sock.recvfrom(1024)
+        if data.decode() == 'EXIT':
+            sys.exit(0)
+        print(data.decode())
 
 def send_msg (s, name, addr, f):
     while True:
         try: 
-            text = str(input())
+            text = input("")
             if text.upper() == "EXIT":
                 # exit the chatroom
                 # not sure if send anything to somebody else
@@ -20,8 +21,10 @@ def send_msg (s, name, addr, f):
                 s.sendto(data, addr)
                 f.write("terminating client...\n")
                 sys.exit()
-            elif text[:6].upper() == "SENDTO":
-                s.sendto(text.encode(), addr)
+            #elif text[:6].upper() == "SENDTO":
+            text = name + " " + text
+            s.sendto(text.encode(), addr)
+            
         except EOFError:
             continue
 

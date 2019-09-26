@@ -1,4 +1,4 @@
-connecting to the server localhost at port 1234
-sending register message John
-received welcome
-terminating client...
+connecting to the server localhost at port 12348
+sending register message Hash
+connecting to the server localhost at port 12348
+sending register message Hash

@@ -66,7 +66,6 @@ def main():
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(ADDR)
  
-    # 创建一个单独的进程处理管理员喊话功能
     pid = os.fork()
     if pid < 0:
         sys.exit('创建进程失败')

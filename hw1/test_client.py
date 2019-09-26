@@ -23,6 +23,7 @@ def send_msg(s, name, ADDR):
                 sys.exit("退出聊天室")
  
             msg = 'C %s %s' % (name, text)
+            print(msg)
             s.sendto(msg.encode(), ADDR)
         except KeyboardInterrupt:
             msg = "Q " + name

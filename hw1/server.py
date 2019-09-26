@@ -2,41 +2,40 @@ import sys
 import socket
 import os
 
-def register (s, registered, userName, client_address):
+def register (s, registered, userName, client_address, f):
     if registered is None:
         registered = {userName : client_address}
     elif userName not in registered:
-        print ("line 10: " + userName + " ")
-        print (client_address)
         registered[userName] = client_address
+        f.write("received register " + userName +" from host port")
         print (registered)
     
-def recv_msg(s, receiver, registered, name, message):
-    print("line 12: " + message)
-    data = name + ": " + message
-    print ("registered list: ")
-    print(registered)
+def recv_msg(s, receiver, registered, name, message,f):
+    data = receiver + ": " + message
+    f.write("receivefrom " + name + " to " + receiver + " " + message)
     s.sendto(data.encode(), registered.get(receiver))
 
 def leave (registered, name):
     del registered[name]
 
-def parent_thread(s):
+def parent_thread(s,f):
     registered = {}
     registered["unused"] = ("0.0.0.0" , 1)
     while True:
         data, client_address = s.recvfrom(1024)
+        f.write("client connection from host port")
         dataList = data.decode().split(' ')
-        #for debug use
-        print("line 26: ")
-        print(dataList)
 
+        print (dataList)
 
-        if dataList[0] == 'REGISTER':  # L为请求登录
-            register(s, registered, dataList[1], client_address)
-        elif dataList[0].upper() == 'SENDTO':
-            recv_msg(s, dataList[1], registered, dataList[1], ' '.join(dataList[2:]))
-        elif dataList[0] == 'EXIT':
+        if dataList[0] == 'REGISTER':  
+            print ("register")
+            register(s, registered, dataList[1], client_address, f)
+        elif dataList[1].upper() == 'SENDTO':
+            print("here")
+            f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + dataList[3])
+            recv_msg(s, dataList[2], registered, dataList[0], ' '.join(dataList[3:]),f)
+        elif dataList[1] == 'EXIT':
             leave(registered, dataList[1])
     
 def main():
@@ -54,19 +53,20 @@ def main():
             logfile = sys.argv[x]
     
     f = open(logfile, "w+")
+    f.write("server started on localhost at port "+ port + "...\n")
+
     # declare a register dict
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('localhost', int(port)))    							# Bind to the port
 
-    f.write("server started on "+s.getsockname()[0]+ " at port "+ port + "...\n")
 
     pid = os.fork()
     if pid < 0:
         sys.exit("fail")
-    else:
-        parent_thread(s)
+    elif pid is not 0:
+        parent_thread(s,f)
 
 if __name__ == '__main__':
     main()
