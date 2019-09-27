@@ -17,8 +17,10 @@ def recv_msg(s, receiver, registered, name, message,f):
     f.write("receivefrom " + name + " to " + receiver + " " + message+"\n")
     s.sendto(data.encode(), registered.get(receiver))
 
-def leave (registered, name):
+def leave (s, registered, name):
+    s.sendto(str("EXIT").encode(), registered.get(name))
     del registered[name]
+
 
 def parent_thread(s,f):
     registered = {}
@@ -37,8 +39,8 @@ def parent_thread(s,f):
             print("here")
             f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + dataList[3]+"\n")
             recv_msg(s, dataList[2], registered, dataList[0], ' '.join(dataList[3:]),f)
-        elif dataList[1] == 'EXIT':
-            leave(registered, dataList[1])
+        elif dataList[0] == 'EXIT':
+            leave(s, registered, dataList[1])
     
 def main():
 

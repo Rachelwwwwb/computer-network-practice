@@ -3,4 +3,4 @@ sending register message Hash
 received welcome 
 connecting to the server localhost at port 12348
 sending register message Hash
-sendto Jack ['hi']
+terminating client...

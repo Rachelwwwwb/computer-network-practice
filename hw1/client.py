@@ -20,17 +20,20 @@ def send_msg (s, name, addr, f):
                 # exit the chatroom
                 # not sure if send anything to somebody else
                 data = "EXIT " + name
-                s.sendto(data, addr)
+                s.sendto(data.encode(), addr)
                 f.write("terminating client...\n")
                 sys.exit()
-            #elif text[:6].upper() == "SENDTO":
-            dataList = text.split(" ")
-            f.write("sendto " + str(dataList[1]) + " " + str(dataList[2:]) + "\n")
-            text = name + " " + text
-            s.sendto(text.encode(), addr)
+                del s
+            else:
+                dataList = text.split(" ")
+                f.write("sendto " + str(dataList[1]) + " " + str(dataList[2:]) + "\n")
+                text = name + " " + text
+                s.sendto(text.encode(), addr)
             
         except EOFError:
             continue
+        except KeyboardInterrupt:
+            sys.exit()
 
 def main():
     if len(sys.argv) < 5:
