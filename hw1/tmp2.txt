@@ -1,6 +1,4 @@
-connecting to the server localhost at port 12348
-sending register message Hash
+connecting to the server localhost at port 55666
+sending register message Mary
 received welcome 
-connecting to the server localhost at port 12348
-sending register message Hash
 terminating client...

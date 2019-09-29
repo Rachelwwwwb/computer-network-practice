@@ -1,5 +1,6 @@
-test = {"hi" : ("1",2)}
-
-test.update({"hii" : ("2",1)})
-
-print (test)
+try:
+    i = 0
+    while True:
+        i += 1
+except KeyboardInterrupt:
+    print ("exiting")

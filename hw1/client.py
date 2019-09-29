@@ -1,7 +1,28 @@
 import sys
 import socket
 import threading
-import os
+from _thread import *
+import threading
+
+
+class sendThread (threading.Thread):   
+    def __init__(self, sock, clientName ,server_address,f):
+        threading.Thread.__init__(self)
+        self.sock = sock
+        self.clientName = clientName
+        self.server_address = server_address
+        self.f = f
+    def run(self): 
+        send_msg(self.sock, self.clientName, self.server_address,self.f)
+
+class receiveThread (threading.Thread):   
+    def __init__(self, sock, f):
+        threading.Thread.__init__(self)
+        self.sock = sock
+        self.f = f
+    def run(self): 
+        recv_msg(self.sock,self.f)
+
 
 def recv_msg (sock,f):
     while True:
@@ -66,48 +87,11 @@ def main():
     sock.sendto(registerMessage.encode(encoding="utf-8"), server_address)
     f.write("sending register message " + str(clientName) + "\n")
 
-    pid = os.fork()
-    if pid < 0:
-        sys.exit("fail to create a new thread")
-    elif pid == 0:
-        send_msg(sock, clientName, server_address,f)
-    else:
-        recv_msg(sock,f)
+    
+    thread_send = sendThread(sock,clientName,server_address,f)
+    thread_receive = receiveThread(sock, f)
+    thread_send.start()
+    thread_receive.start()
 
 if __name__ == "__main__":
     main()
-
-    # try:
-    #     hasInput = True
-    #     while(hasInput):
-    #         # contantly receive message from others
-    #         data, server_detail = sock.recvfrom(1024)
-    #         data = str(data.decode(encoding='utf-8'))
-    #         #if receive from the server
-    #         print ("line 47: " + data)
-    #         if str(data) == "WELCOME " + clientName.upper():
-    #             f.write("received welcome\n")
-    #         else:
-    #             print (data)
-
-    #         #constantly waiting for an input to send to others
-    #         answer = str(input())
-    #         print ("to test if input is a blocking line")
-    #         #if exit
-    #         if answer.upper() == "EXIT":
-    #             hasInput = False
-    #         elif answer[:6].upper() == "SENDTO":
-    #             user_input = "SENDTO" + " " + str(clientName) + " " + answer[7:]
-    #             data = user_input.encode(encoding="utf-8") 
-    #             sock.sendto(data, server_address)
-    #         else:
-    #             print ("here")
-    #             continue
-
-    # # except:
-    # #     print ("Something went wrong while connecting to server")
-    # finally:
-    #     f.write("terminating client...\n")
-    #     data = "exit".encode(encoding="utf-8")
-    #     sock.sendto(data, server_address) 
-    #     sock.close()

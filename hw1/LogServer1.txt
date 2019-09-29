@@ -1,0 +1,8 @@
+server started on localhost at port 7854...
+client connection from host port
+server overlay started at port 2506
+server joined overlay from host port
+received register John from host port
+sendto Jack from Mary hi
+receivefrom Mary to Jack hi
+terminating server...
