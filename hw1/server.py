@@ -61,11 +61,14 @@ def recv_msg(s, receiver, registered, name, message,f):
     if (receiver not in registered):
         #call another function that forwards to another server
         f.write(receiver + " not registered with server\n")
+        f.flush()
         forward_message(s, receiver, name, message)
         f.write("sending message to server overlay " + message + "\n")
+        f.flush()
         return
     s.sendto(data.encode(), registered.get(receiver))
     f.write("receivefrom " + name + " to " + receiver + " " + message+"\n")
+    f.flush()
 
 def forward_message(s, receiver, name, message):
     global connectionList
