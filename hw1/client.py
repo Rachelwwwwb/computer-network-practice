@@ -31,6 +31,15 @@ def recv_msg (sock,f):
             sys.exit(0)
         elif data.decode().upper() == "WELCOME":
             f.write("received welcome \n")
+            f.flush()
+
+        else:
+            name = str(data.decode().split(":")[0])
+            message = ""
+            for x in data.decode().split(":")[1:]:
+                message += " " + str(x)
+            f.write("recvfrom " + name + message + "\n")
+            f.flush()
         print(data.decode())
 
 def send_msg (s, name, addr, f):
@@ -43,11 +52,16 @@ def send_msg (s, name, addr, f):
                 data = "EXIT " + name
                 s.sendto(data.encode(), addr)
                 f.write("terminating client...\n")
+                f.flush()
                 sys.exit()
                 del s
             else:
                 dataList = text.split(" ")
-                f.write("sendto " + str(dataList[1]) + " " + str(dataList[2:]) + "\n")
+                message = ""
+                for x in dataList[2:]:
+                    message += " " + str(x)
+                f.write("sendto " + str(dataList[1]) + " " + message + "\n")
+                f.flush()
                 text = name + " " + text
                 s.sendto(text.encode(), addr)
             
@@ -77,6 +91,7 @@ def main():
 
     f = open(logfile, "w+")
     f.write("connecting to the server "+ serverIP + " at port "+ port + "\n")
+    f.flush()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -86,8 +101,8 @@ def main():
     registerMessage = "REGISTER "+ clientName
     sock.sendto(registerMessage.encode(encoding="utf-8"), server_address)
     f.write("sending register message " + str(clientName) + "\n")
+    f.flush()
 
-    
     thread_send = sendThread(sock,clientName,server_address,f)
     thread_receive = receiveThread(sock, f)
     thread_send.start()

@@ -1,8 +1,11 @@
-server started on localhost at port 7854...
-client connection from host port
-server overlay started at port 2506
-server joined overlay from host port
-received register John from host port
-sendto Jack from Mary hi
-receivefrom Mary to Jack hi
+server started on localhost at port 7584...
+server overlay started at port 2500
+server joined overlay from host localhost port 50973
+client connection from host localhost port 63465
+received register John from localhost 63465
+sendto Mary from John  Hi. How are you?
+Mary not registered with server
+sending message to server overlay Hi. How are you?
+sendto John from Mary  I am good. Thank you.
+receivefrom Mary to John I am good. Thank you.
 terminating server...

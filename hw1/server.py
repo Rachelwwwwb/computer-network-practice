@@ -36,50 +36,44 @@ class myThread (threading.Thread):
         self.addr = addr
         self.s_UDP = s_UDP
     def run(self): 
-        try: 
-            global connectionList
-            if self.threadID == 1:
-                receiveConnection (self.s_send,self.f, self.s_UDP, self.addr)
-            elif self.threadID == 2:
-                sendConnection (self.s_send,self.f, self.s,  self.addr)
-        except KeyboardInterrupt:
-            print ("exiting")
-            sys.exit()
-
+        global connectionList
+        if self.threadID == 1:
+            receiveConnection (self.s_send,self.f, self.s_UDP, self.addr)
+        elif self.threadID == 2:
+            sendConnection (self.s_send,self.f, self.s,  self.addr)
+        
 def register (s, registered, userName, client_address, f):
+    port = str(client_address[1])
+    f.write("client connection from host localhost port " + port + "\n")
+    f.flush()
     if registered is None:
         registered = {userName : client_address}
     elif userName not in registered:
         registered[userName] = client_address
-        f.write("received register " + userName +" from host port\n")
+        f.write("received register " + userName +" from localhost " + port + "\n")
         f.flush()
-        print (registered)
     #welcome 
     s.sendto(str("welcome").encode(),client_address)
     
 def recv_msg(s, receiver, registered, name, message,f):
-    data = receiver + ": " + message
-    f.write("receivefrom " + name + " to " + receiver + " " + message+"\n")
+    data = name + ": " + message
     f.flush()
     if (receiver not in registered):
         #call another function that forwards to another server
+        f.write(receiver + " not registered with server\n")
         forward_message(s, receiver, name, message)
+        f.write("sending message to server overlay " + message + "\n")
         return
     s.sendto(data.encode(), registered.get(receiver))
+    f.write("receivefrom " + name + " to " + receiver + " " + message+"\n")
 
 def forward_message(s, receiver, name, message):
     global connectionList
     data = name + " sendto " + receiver + " " + message
-    print (data)
     if len(connectionList) > 0:
         con = connectionList[0]
-        print (con)
         con.send(data.encode()) 
-    # else:
-    #     print (s)
-    #     print (s.getsockname())
-    #     addr = (str(s.getsockname()[0]),int(str(s.getsockname()[1])))
-    #     s.sendto(data.encode(),addr)
+
 
 def leave (s, registered, name):
     s.sendto(str("EXIT").encode(), registered.get(name))
@@ -88,34 +82,25 @@ def leave (s, registered, name):
 def parent_thread(s,f):
     global connectionList
     registered["unused"] = ("0.0.0.0" , 1)
-    f.write("client connection from host port\n")
     f.flush()
-    try:    
-        while True:
-            data, client_address = s.recvfrom(1024)
-            dataList = data.decode().split(' ')
+    while True:
+        data, client_address = s.recvfrom(1024)
+        dataList = data.decode().split(' ')
 
-            print (dataList)
-
-            if dataList[0] == 'REGISTER':  
-                print ("register")
-                register(s, registered, dataList[1], client_address, f)
-                dataList = []
-            elif dataList[1].upper() == 'SENDTO':
-                print("here")
-                f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + dataList[3]+"\n")
-                f.flush()
-                recv_msg(s, dataList[2], registered, dataList[0], ' '.join(dataList[3:]),f)
-                dataList = []
-            elif dataList[0] == 'EXIT':
-                leave(s, registered, dataList[1])
-                dataList = []
-    except KeyboardInterrupt:
-        f.write("terminating server...")
-        print ("line 95 terminating")
-        f.flush()
-        f.close()
-        sys.exit()
+        if dataList[0] == 'REGISTER':  
+            register(s, registered, dataList[1], client_address, f)
+            dataList = []
+        elif dataList[1].upper() == 'SENDTO':
+            message = ""
+            for x in dataList[3:]:
+                message += " " + str(x)
+            f.write("sendto " + dataList[2] + " from " + dataList[0] + " " + message +"\n")
+            f.flush()
+            recv_msg(s, dataList[2], registered, dataList[0], ' '.join(dataList[3:]),f)
+            dataList = []
+        elif dataList[0] == 'EXIT':
+            leave(s, registered, dataList[1])
+            dataList = []
 
 # send the message only; don't need to listen
 def receiveConnection(s,f, s_UDP, localAdress):
@@ -123,11 +108,9 @@ def receiveConnection(s,f, s_UDP, localAdress):
 
     s.listen(5)
     while True: 
-        print ("line 62: try to connect")
         connection, overlay_address = s.accept()     # Establish connection with other server.
         if connection:
-            print ("connected")
-            f.write("server joined overlay from host port\n")
+            f.write("server joined overlay from host localhost port " + str(overlay_address[1]) + "\n")
             f.flush()
             connectionList.append(connection)
             readData(connection, s_UDP, localAdress)
@@ -185,15 +168,7 @@ def main():
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('localhost', int(port)))    							# Bind to the port
     parent = parentThread(s, f)
-
-    try:
-        parent.start()
-    except KeyboardInterrupt:
-        f.write("terminating server...")
-        print ("exiting")
-        f.flush()
-        f.close()
-        sys.exit()
+    parent.start()
 
 
     # try connect to the overlay service through TCP
