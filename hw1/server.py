@@ -54,10 +54,9 @@ def register (s, registered, userName, client_address, f):
         f.flush()
     #welcome 
     s.sendto(str("welcome").encode(),client_address)
-    
+
 def recv_msg(s, receiver, registered, name, message,f):
     data = name + ": " + message
-    f.flush()
     if (receiver not in registered):
         #call another function that forwards to another server
         f.write(receiver + " not registered with server\n")
@@ -85,7 +84,6 @@ def leave (s, registered, name):
 def parent_thread(s,f):
     global connectionList
     registered["unused"] = ("0.0.0.0" , 1)
-    f.flush()
     while True:
         data, client_address = s.recvfrom(1024)
         dataList = data.decode().split(' ')

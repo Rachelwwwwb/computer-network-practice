@@ -1,6 +1,5 @@
 connecting to the server localhost at port 9000
 sending register message Mary
 received welcome 
-recvfrom John  Hi. How are you?
-sendto John  I am good. Thank you. 
-terminating client...
+recvfrom John  hi
+sendto John  nice to meet you
