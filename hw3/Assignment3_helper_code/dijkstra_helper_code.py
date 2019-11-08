@@ -7,7 +7,6 @@ def readFile(fileName):
     text = f.readlines()
     lineNum = int(text[0])
     
-    # adjacency matrix
     graph = []
 
     for i in range(lineNum):
@@ -28,8 +27,8 @@ def readFile(fileName):
                 x += 2 + digitals
                 graph.append([source, dest, value])
 
-    # for s in range(len(graph)): 
-    #     print(graph[s]) 
+    for s in range(len(graph)): 
+        print(graph[s]) 
 
     sn = text[lineNum + 1][0]
     dn = text[lineNum + 2][0]
@@ -83,7 +82,7 @@ def run_dijkstra(graph, sn, dn):
     
     printString = ""
     for i in range(len(result) - 1):
-        printString += result[i] + "-"
+        printString += result[i] + " -"
         printString += str(num[i]) + "->"
     printString += result[len(result) - 1]
     printString += "\n" + str(totalCost)
