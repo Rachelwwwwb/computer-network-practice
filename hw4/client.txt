@@ -1,0 +1,4 @@
+connecting to the server localhost at port 1233
+sending register message myname
+received welcome 
+sendto hi 

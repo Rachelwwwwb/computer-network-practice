@@ -79,8 +79,6 @@ def print_output(result, filename):
         line = str(x.cost) + " " + x.a.v + " " + x.b.v + "\n"
         filel.write(line)
 
-    #Write strings as mentioned in 'expected output' seciton in the assignment
-
 def start_mst():
     graph = readFile('input.txt')
     result = run_mst(graph)

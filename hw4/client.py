@@ -4,6 +4,7 @@ import threading
 from _thread import *
 import threading
 
+registered = False
 
 class sendThread (threading.Thread):   
     def __init__(self, sock, clientName ,server_address,f):
@@ -32,6 +33,7 @@ def recv_msg (sock,f):
         elif data.decode().upper() == "WELCOME":
             f.write("received welcome \n")
             f.flush()
+            # registered = True
 
         else:
             name = str(data.decode().split(":")[0])
@@ -44,25 +46,16 @@ def recv_msg (sock,f):
 
 def send_msg (s, name, addr, f):
     while True:
+        # if registered:
         try: 
             text = input("")
-            if text.upper() == "EXIT":
-                # exit the chatroom
-                data = "EXIT " + name
-                s.sendto(data.encode(), addr)
-                f.write("terminating client...\n")
-                f.flush()
-                sys.exit()
-                del s
-            else:
-                dataList = text.split(" ")
-                message = ""
-                for x in dataList[2:]:
-                    message += " " + str(x)
-                f.write("sendto " + str(dataList[1]) + " " + message + "\n")
-                f.flush()
-                text = name + " " + text
-                s.sendto(text.encode(), addr)
+            dataList = text.split(" ")
+            message = ""
+            for x in dataList[2:]:
+                message += " " + str(x)
+            f.write("sendto " + str(dataList[1]) + " " + message + "\n")
+            f.flush()
+            s.sendto(text.encode(), addr)
             
         except EOFError:
             continue
@@ -81,31 +74,33 @@ def main():
         elif sys.argv[x] == "-l":
             x += 1
             logfile = sys.argv[x]
-        elif sys.argv[x] == "-s":
+        elif sys.argv[x] == "-d":
             x += 1
-            serverIP = sys.argv[x]
+            destIP = sys.argv[x]
         elif sys.argv[x] == "-n":
             x += 1
             clientName = sys.argv[x]
 
     f = open(logfile, "w+")
-    f.write("connecting to the server "+ serverIP + " at port "+ port + "\n")
-    f.flush()
+    f.write("connecting to the server "+ destIP + " at port "+ port + "\n")
+    f.flush()   
+    print ("connecting to the server "+ destIP + " at port "+ port)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    server_address = (serverIP, int(port))
+    server_address = (destIP, int(port))
     
     #only send once: register some time
-    registerMessage = "REGISTER "+ clientName
+    registerMessage = "register "+ clientName
     sock.sendto(registerMessage.encode(encoding="utf-8"), server_address)
     f.write("sending register message " + str(clientName) + "\n")
     f.flush()
+    print ("sending register message " + str(clientName))
 
     thread_send = sendThread(sock,clientName,server_address,f)
     thread_receive = receiveThread(sock, f)
-    thread_send.start()
     thread_receive.start()
+    thread_send.start()
 
 if __name__ == "__main__":
     main()
