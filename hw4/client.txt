@@ -1,4 +1,5 @@
 connecting to the server localhost at port 1233
 sending register message myname
 received welcome 
-sendto hi 
+sendto hi
+recvfrom 127.0.0.1,1233 received

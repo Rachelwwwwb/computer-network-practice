@@ -28,21 +28,16 @@ class receiveThread (threading.Thread):
 def recv_msg (sock,f):
     while True:
         data, addr = sock.recvfrom(1024)
-        if data.decode() == 'EXIT':
-            sys.exit(0)
-        elif data.decode().upper() == "WELCOME":
+        if data.decode().upper() == "WELCOME":
             f.write("received welcome \n")
             f.flush()
             # registered = True
 
         else:
-            name = str(data.decode().split(":")[0])
-            message = ""
-            for x in data.decode().split(":")[1:]:
-                message += " " + str(x)
-            f.write("recvfrom " + name + message + "\n")
+            name = str(addr[0]) + "," + str(addr[1])
+            f.write("recvfrom " + name + " received")
             f.flush()
-        print(data.decode())
+            print("recvfrom " + name + " received")
 
 def send_msg (s, name, addr, f):
     while True:
@@ -50,11 +45,10 @@ def send_msg (s, name, addr, f):
         try: 
             text = input("")
             dataList = text.split(" ")
-            message = ""
-            for x in dataList[2:]:
-                message += " " + str(x)
-            f.write("sendto " + str(dataList[1]) + " " + message + "\n")
+            message = "".join(dataList[1:])
+            f.write("sendto " + message + "\n")
             f.flush()
+            print ("sendto " + message + "\n")
             s.sendto(text.encode(), addr)
             
         except EOFError:

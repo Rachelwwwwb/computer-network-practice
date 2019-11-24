@@ -3,6 +3,7 @@ import socket
 import sys       
 
 natTable = {}
+assignPort = 10000
 
 if len(sys.argv) < 3:
         print("missing parameters")
@@ -26,13 +27,11 @@ for x in range(len(sys.argv)):
         IP = sys.argv[x]
 
 f = open(logfile, "w+")
-f.write("server started on " + IP + " at port "+ myport + "...\n")
-f.flush()
 
 server_address = (destIP, int(destPort))
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
-s.bind((IP, int(myport)))        							# Bind to the port
+s.bind(("localhost", int(myport)))        							# Bind to the port
 print (" Binding completed  ! !")
 
 while True:
@@ -42,10 +41,15 @@ while True:
         # register the the client name and assign a new port
         print (data.decode())
         if data.decode().split()[0].upper() == "REGISTER":
-            newport = 5555
+            newport = assignPort
+            assignPort += 1
             natTable[client_address] = newport
             welcomemsg = "WELCOME"
-            print ("register successfully")
+            name = "".join(data.decode().split()[1:])
+            writeMsg = name + " | " + str(client_address[0]) + "," + str(client_address[1]) + " | " + IP + "," + str(newport)
+            f.write(writeMsg)
+            f.flush()
+            print (writeMsg)
             s.sendto(welcomemsg.upper().encode(), client_address)
         elif data.decode().split()[0].upper() == "SENDTO":
             msg = data.decode().split()[1:]
@@ -55,3 +59,9 @@ while True:
             msg1 = prepend + " " + msg1
             print (msg1)
             s.sendto(msg1.encode(),server_address)
+        # receive back from the server 
+        elif data.decode().split()[0] == IP:
+            newport = int(data.decode().split()[1])
+            for address in natTable:
+                if natTable[address] == newport:
+                    s.sendto(data,address)
