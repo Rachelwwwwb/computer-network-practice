@@ -1,4 +1,4 @@
 connecting to the server localhost at port 7585
 sending register message John
-received welcome 
-sendto helloword
+sending helloworld
+recvfrom 127.0.0.1,7585 received

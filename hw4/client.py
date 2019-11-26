@@ -29,10 +29,7 @@ def recv_msg (sock,f):
     while True:
         data, addr = sock.recvfrom(1024)
         if data.decode().upper() == "WELCOME":
-            f.write("received welcome \n")
-            f.flush()
-            # registered = True
-
+            pass
         else:
             name = str(addr[0]) + "," + str(addr[1])
             f.write("recvfrom " + name + " received")
@@ -41,14 +38,12 @@ def recv_msg (sock,f):
 
 def send_msg (s, name, addr, f):
     while True:
-        # if registered:
         try: 
             text = input("")
-            dataList = text.split(" ")
-            message = "".join(dataList[1:])
-            f.write("sendto " + message + "\n")
+            message = "".join(text.split()[1:])
+            f.write("sending " + message + "\n")
             f.flush()
-            print ("sendto " + message + "\n")
+            print ("sending " + message + "\n")
             s.sendto(text.encode(), addr)
             
         except EOFError:

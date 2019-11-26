@@ -20,24 +20,23 @@ print ("server started on localhost at port " + port)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
 s.bind(('localhost', int(port)))        							# Bind to the port
-print (" Binding completed  ! !")
 
 while True:
     data, client_address = s.recvfrom(1024)
     if (data):
-        f.write("client connection from " + str(client_address[0]) + "," + str(client_address[1]))
         if data.decode().split()[0].upper() == "REGISTER":
-            f.write("received register " + str(data.decode().split[0])+ " from " + str(client_address[0]) + "," + str(client_address[1]))
+            f.write("client connection from " + str(client_address[0]) + "," + str(client_address[1])+"\n")
+            f.write("received register " + str(data.decode().split()[0])+ " from " + str(client_address[0]) + "," + str(client_address[1]))
             welcomemsg = "WELCOME"
             s.sendto(welcomemsg.upper().encode(), client_address) 
         elif data.decode().split()[0].upper() == "SENDTO":
-            f.write("recvfrom " + str(client_address[0]) + "," + str(client_address[1]) + " " + "".join(data.decode().split()[1:]))
-            f.flush("recvfrom " + str(client_address[0]) + "," + str(client_address[1]) + " " + "".join(data.decode().split()[1:]))
-            print ()
+            f.write("recvfrom " + str(client_address[0]) + "," + str(client_address[1]) + " " + "".join(data.decode().split()[1:])+"\n")
+            f.flush()
             s.sendto(data,client_address)
         else:
+            print ("here")
             msg = "".join(data.decode().split()[2:])
-            f.write("recvfrom " + str(data.decode().split()[0]) + "," + str(data.decode().split()[1]) + " " + msg)
+            f.write("recvfrom " + str(data.decode().split()[0]) + "," + str(data.decode().split()[1]) + " " + msg + "\n")
             f.flush()
             print ("recvfrom " + str(data.decode().split()[0]) + "," + str(data.decode().split()[1]) + " " + msg)
             s.sendto(data,client_address)
